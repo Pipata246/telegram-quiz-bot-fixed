@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Game</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Экран загрузки -->
+        <div id="loading-screen" class="screen active">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <h2>Загрузка игры...</h2>
+                <p>Подготавливаем вопросы для вас</p>
+            </div>
+        </div>
+
+        <!-- Стартовый экран -->
+        <div id="start-screen" class="screen">
+            <div class="start-content">
+                <h1>🎯 Quiz Game</h1>
+                <div class="game-info">
+                    <div class="info-item">
+                        <span class="icon">❓</span>
+                        <span>10 вопросов</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">⏱️</span>
+                        <span>15 секунд на вопрос</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">💡</span>
+                        <span>2 подсказки "50/50"</span>
+                    </div>
+                </div>
+                <button id="start-btn" class="btn btn-primary">Начать игру</button>
+            </div>
+        </div>
+
+        <!-- Игровой экран -->
+        <div id="game-screen" class="screen">
+            <div class="game-header">
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div id="progress-fill" class="progress-fill"></div>
+                    </div>
+                    <span id="question-counter">1/10</span>
+                </div>
+                <div class="game-stats">
+                    <div class="timer-container">
+                        <div id="timer-circle" class="timer-circle">
+                            <span id="timer-text">15</span>
+                        </div>
+                    </div>
+                    <div class="hints-container">
+                        <button id="hint-btn" class="hint-btn" title="Подсказка 50/50">
+                            💡 <span id="hints-count">2</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-container">
+                <h2 id="question-text" class="question-text"></h2>
+                <div id="answers-container" class="answers-container">
+                    <button class="answer-btn" data-index="0"></button>
+                    <button class="answer-btn" data-index="1"></button>
+                    <button class="answer-btn" data-index="2"></button>
+                    <button class="answer-btn" data-index="3"></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран результатов -->
+        <div id="result-screen" class="screen">
+            <div class="result-content">
+                <div class="result-icon">🎉</div>
+                <h2>Игра завершена!</h2>
+                <div class="result-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Правильных ответов:</span>
+                        <span id="correct-count" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Набрано очков:</span>
+                        <span id="total-score" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Точность:</span>
+                        <span id="accuracy" class="stat-value">0%</span>
+                    </div>
+                </div>
+                <div class="result-actions">
+                    <button id="save-result-btn" class="btn btn-primary">Сохранить результат</button>
+                    <button id="play-again-btn" class="btn btn-secondary">Играть снова</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="quiz-data.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
