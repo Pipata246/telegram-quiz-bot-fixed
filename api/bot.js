@@ -112,7 +112,7 @@ async function handleMessage(update) {
         
         // Также проверим через API для отладки
         try {
-          const apiUrl = `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://tg-mini-ap-igra.vercel.app'}/api/get-stats?userId=${userId}`;
+          const apiUrl = `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://telegram-quiz-bot-chi.vercel.app'}/api/get-stats?userId=${userId}`;
           console.log('Checking stats via API:', apiUrl);
           
           const response = await fetch(apiUrl);

@@ -12,7 +12,7 @@ async function initStorage() {
 
 async function getTelegramUsername(userId) {
   try {
-    const response = await fetch(`https://tg-mini-ap-igra.vercel.app/api/get-telegram-user`, {
+    const response = await fetch(`https://telegram-quiz-bot-chi.vercel.app/api/get-telegram-user`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
