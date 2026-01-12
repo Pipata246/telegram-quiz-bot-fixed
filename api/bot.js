@@ -93,14 +93,30 @@ async function handleMessage(update) {
     // Обработка кнопок меню
     switch (text) {
       case '🎮 Играть':
+        const webAppUrl = process.env.VERCEL_URL ? 
+          `https://${process.env.VERCEL_URL}` : 
+          'https://telegram-quiz-bot-chi.vercel.app';
+        
         const playMessage = `
 🎮 Готовы начать игру?
 
-Чтобы начать играть, перейдите в мини-приложение!
+Нажмите кнопку ниже, чтобы запустить мини-приложение!
 
 Там вас ждет увлекательная викторина с множеством интересных вопросов.
         `;
-        await sendMessage(chatId, playMessage, mainMenu);
+        
+        const webAppKeyboard = {
+          reply_markup: {
+            inline_keyboard: [
+              [{
+                text: '🎮 Запустить игру',
+                web_app: { url: webAppUrl }
+              }]
+            ]
+          }
+        };
+        
+        await sendMessage(chatId, playMessage, webAppKeyboard);
         break;
 
       case '📊 Моя статистика':
