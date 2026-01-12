@@ -131,8 +131,6 @@ async function handleMessage(update) {
 🏆 Лучший результат: ${stats.bestScore}/10
 📈 Средний результат: ${stats.averageScore.toFixed(1)}/10
 ⭐ Общий рейтинг: ${stats.totalScore} очков
-
-🔧 Debug: User ID ${userId}
         `;
         
         console.log('Sending stats message...');

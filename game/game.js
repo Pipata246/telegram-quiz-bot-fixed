@@ -10,6 +10,7 @@ class QuizGame {
         this.timeLeft = 15;
         this.timer = null;
         this.isAnswered = false;
+        this.isResultSaved = false;
         
         this.initializeElements();
         this.initializeTelegram();
@@ -100,6 +101,7 @@ class QuizGame {
         this.correctAnswers = 0;
         this.wrongAnswers = 0;
         this.hintsUsed = 0;
+        this.isResultSaved = false;
         this.updateHintsDisplay();
         this.clearTimer();
     }
@@ -165,7 +167,9 @@ class QuizGame {
         answerButtons.forEach((btn, index) => {
             btn.textContent = answers[index];
             btn.disabled = false;
+            // Сбрасываем все классы стилизации
             btn.className = 'answer-btn';
+            btn.classList.remove('correct', 'incorrect', 'hidden', 'hiding');
             btn.style.opacity = '0';
             btn.style.transform = 'translateY(20px)';
             
@@ -412,6 +416,16 @@ class QuizGame {
     }
 
     saveResult() {
+        // Проверяем, не сохранен ли уже результат
+        if (this.isResultSaved) {
+            this.showSaveNotification('Результат уже сохранен!', 'info');
+            return;
+        }
+
+        // Блокируем кнопку и меняем текст
+        this.saveResultBtn.disabled = true;
+        this.saveResultBtn.textContent = 'Сохранение...';
+
         const gameData = {
             score: this.score,
             correctAnswers: this.correctAnswers,
@@ -484,12 +498,20 @@ class QuizGame {
             console.log('API response:', result);
 
             if (result.success) {
+                this.isResultSaved = true;
+                this.saveResultBtn.textContent = 'Результат сохранен ✓';
                 this.showSaveNotification('Результат сохранен!', 'success');
             } else {
+                // Разблокируем кнопку при ошибке
+                this.saveResultBtn.disabled = false;
+                this.saveResultBtn.textContent = 'Сохранить результат';
                 this.showSaveNotification('Ошибка при сохранении: ' + result.error, 'error');
             }
         } catch (error) {
             console.error('Error saving via API:', error);
+            // Разблокируем кнопку при ошибке сети
+            this.saveResultBtn.disabled = false;
+            this.saveResultBtn.textContent = 'Сохранить результат';
             this.showSaveNotification('Ошибка сети: ' + error.message, 'error');
         }
     }
@@ -516,6 +538,10 @@ class QuizGame {
     }
 
     restartGame() {
+        // Сбрасываем состояние кнопки сохранения
+        this.saveResultBtn.disabled = false;
+        this.saveResultBtn.textContent = 'Сохранить результат';
+        
         this.hideScreen(this.resultScreen);
         this.startGame();
     }
@@ -591,6 +617,43 @@ const feedbackStyles = `
 @keyframes bounce {
     0% { transform: translateY(0px); }
     100% { transform: translateY(-5px); }
+}
+
+/* Стили для уведомлений о сохранении */
+.save-notification {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    padding: 15px 25px;
+    border-radius: 10px;
+    font-weight: bold;
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.save-notification.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.save-notification.success {
+    background: #d4edda;
+    color: #155724;
+    border: 2px solid #28a745;
+}
+
+.save-notification.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 2px solid #dc3545;
+}
+
+.save-notification.info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 2px solid #17a2b8;
 }
 `;
 
