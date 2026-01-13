@@ -4,6 +4,23 @@ if (!BOT_TOKEN) {
   throw new Error('BOT_TOKEN environment variable is required');
 }
 
+let storage = null;
+
+// Инициализация хранилища
+async function initStorage() {
+  if (!storage) {
+    try {
+      const SupabaseStorage = require('./supabase');
+      storage = new SupabaseStorage();
+      await storage.init();
+    } catch (error) {
+      console.error('Failed to initialize Supabase:', error);
+      return null;
+    }
+  }
+  return storage;
+}
+
 // Главное меню
 const mainMenu = {
   reply_markup: {
@@ -58,9 +75,46 @@ module.exports = async (req, res) => {
       console.log('Received update:', JSON.stringify(update, null, 2));
       
       // Простая обработка без Supabase для начала
-      if (update.message && update.message.text) {
+      // Обработка Web App данных
+      if (update.message && update.message.web_app_data) {
+        const chatId = update.message.chat.id;
+        const userId = update.message.from.id;
+        
+        try {
+          const store = await initStorage();
+          if (store) {
+            const gameData = JSON.parse(update.message.web_app_data.data);
+            const { score, correctAnswers, wrongAnswers, totalQuestions } = gameData;
+
+            await store.saveGameResult(userId, score, correctAnswers, wrongAnswers, totalQuestions);
+
+            const resultMessage = `🎉 Игра завершена!
+
+📊 Ваш результат:
+✅ Правильных ответов: ${correctAnswers}/${totalQuestions}
+⭐ Набрано очков: ${score}
+
+Отличная работа! Продолжайте играть и улучшайте свои результаты!`;
+
+            await sendMessage(chatId, resultMessage, mainMenu);
+          }
+        } catch (error) {
+          console.error('Error processing game result:', error);
+          await sendMessage(chatId, 'Произошла ошибка при сохранении результата.', mainMenu);
+        }
+      }
+      // Обработка текстовых сообщений
+      else if (update.message && update.message.text) {
         const chatId = update.message.chat.id;
         const text = update.message.text;
+        
+        // Регистрируем пользователя при любом сообщении
+        const store = await initStorage();
+        if (store) {
+          const userId = update.message.from.id;
+          const username = update.message.from.username || update.message.from.first_name || `User_${userId}`;
+          await store.registerUser(userId, username);
+        }
         
         if (text === '/start') {
           const welcomeMessage = `🎉 Добро пожаловать в Quiz Bot!\n\nПроверьте свои знания в увлекательной викторине!`;
@@ -81,6 +135,67 @@ module.exports = async (req, res) => {
           };
           
           await sendMessage(chatId, playMessage, webAppKeyboard);
+        } else if (text === '📊 Моя статистика') {
+          const store = await initStorage();
+          if (store) {
+            const userId = update.message.from.id;
+            const stats = await store.getUserStats(userId);
+            
+            const statsMessage = `📊 Ваша статистика:
+
+🎯 Всего игр: ${stats.totalGames}
+✅ Правильных ответов: ${stats.correctAnswers}
+❌ Неправильных ответов: ${stats.wrongAnswers}
+🏆 Лучший результат: ${stats.bestScore}/10
+📈 Средний результат: ${stats.averageScore.toFixed(1)}/10
+⭐ Общий рейтинг: ${stats.totalScore} очков`;
+            
+            await sendMessage(chatId, statsMessage, mainMenu);
+          } else {
+            await sendMessage(chatId, 'Статистика временно недоступна', mainMenu);
+          }
+        } else if (text === '🏆 Списки лидеров') {
+          const store = await initStorage();
+          if (store) {
+            const leaders = await store.getLeaderboard();
+            
+            let leaderMessage = '🏆 Топ-10 игроков:\n\n';
+            
+            leaders.forEach((leader, index) => {
+              const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+              leaderMessage += `${medal} ${leader.username} - ${leader.total_score} очков\n`;
+            });
+
+            if (leaders.length === 0) {
+              leaderMessage = '🏆 Список лидеров пока пуст.\nСтаньте первым!';
+            }
+
+            await sendMessage(chatId, leaderMessage, mainMenu);
+          } else {
+            await sendMessage(chatId, 'Список лидеров временно недоступен', mainMenu);
+          }
+        } else if (text === 'ℹ️ Информация/Поддержка') {
+          const infoMessage = `ℹ️ Информация о игре
+
+🎮 Quiz Bot - это увлекательная викторина с множеством категорий вопросов!
+
+📋 Правила игры:
+• В каждой игре 10 случайных вопросов
+• На каждый вопрос дается 15 секунд
+• 4 варианта ответа, только один правильный
+• За каждый правильный ответ +10 очков
+• У вас есть 2 подсказки "50/50" за игру
+
+🏆 Система рейтинга:
+• Очки накапливаются за все игры
+• Соревнуйтесь с другими игроками
+• Следите за своей статистикой
+
+📞 Поддержка:
+По всем вопросам обращайтесь к администратору.
+
+Удачи в игре! 🍀`;
+          await sendMessage(chatId, infoMessage, mainMenu);
         } else {
           await sendMessage(chatId, 'Используйте кнопки меню для навигации 👇', mainMenu);
         }
