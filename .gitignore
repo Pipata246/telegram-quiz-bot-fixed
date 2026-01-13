@@ -18,7 +18,6 @@ yarn-error.log*
 
 # Data files
 data/
-*.json
 
 # Logs
 logs
