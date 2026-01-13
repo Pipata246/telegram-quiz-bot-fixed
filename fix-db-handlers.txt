@@ -1,1 +1,0 @@
-Fixed database handlers with proper error handling and added admin contact

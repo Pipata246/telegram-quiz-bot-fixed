@@ -1,0 +1,19 @@
+{
+  "functions": {
+    "api/bot.js": {
+      "maxDuration": 10
+    },
+    "api/save-result.js": {
+      "maxDuration": 10
+    },
+    "api/get-stats.js": {
+      "maxDuration": 10
+    },
+    "api/get-telegram-user.js": {
+      "maxDuration": 10
+    },
+    "api/fix-usernames.js": {
+      "maxDuration": 10
+    }
+  }
+}
