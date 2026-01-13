@@ -1,0 +1,1 @@
+Updated Supabase dependency to fix module not found error
