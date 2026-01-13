@@ -92,32 +92,32 @@ async function handleMessage(update) {
 
     // Обработка кнопок меню
     switch (text) {
-      case '🎮 Играть':
-        const webAppUrl = process.env.VERCEL_URL ? 
-          `https://${process.env.VERCEL_URL}` : 
-          'https://telegram-quiz-bot-chi.vercel.app';
-        
-        const playMessage = `
+        case '🎮 Играть':
+          const webAppUrl = process.env.VERCEL_URL ? 
+            `https://${process.env.VERCEL_URL}` : 
+            'https://telegram-quiz-bot-fixed.vercel.app';
+          
+          const playMessage = `
 🎮 Готовы начать игру?
 
 Нажмите кнопку ниже, чтобы запустить мини-приложение!
 
 Там вас ждет увлекательная викторина с множеством интересных вопросов.
-        `;
-        
-        const webAppKeyboard = {
-          reply_markup: {
-            inline_keyboard: [
-              [{
-                text: '🎮 Запустить игру',
-                web_app: { url: webAppUrl }
-              }]
-            ]
-          }
-        };
-        
-        await sendMessage(chatId, playMessage, webAppKeyboard);
-        break;
+          `;
+          
+          const webAppKeyboard = {
+            reply_markup: {
+              inline_keyboard: [
+                [{
+                  text: '🎮 Запустить игру',
+                  web_app: { url: webAppUrl }
+                }]
+              ]
+            }
+          };
+          
+          await sendMessage(chatId, playMessage, webAppKeyboard);
+          break;
 
       case '📊 Моя статистика':
         console.log('=== GETTING USER STATS ===');
@@ -128,7 +128,7 @@ async function handleMessage(update) {
         
         // Также проверим через API для отладки
         try {
-          const apiUrl = `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://telegram-quiz-bot-chi.vercel.app'}/api/get-stats?userId=${userId}`;
+          const apiUrl = `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://telegram-quiz-bot-fixed.vercel.app'}/api/get-stats?userId=${userId}`;
           console.log('Checking stats via API:', apiUrl);
           
           const response = await fetch(apiUrl);

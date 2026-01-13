@@ -470,8 +470,9 @@ class QuizGame {
         try {
             console.log('Saving via API with user data:', { userId, username });
             
-            // Используем абсолютный URL
-            const apiUrl = 'https://telegram-quiz-bot-chi.vercel.app/api/save-result';
+            const apiUrl = process.env.VERCEL_URL ? 
+              `https://${process.env.VERCEL_URL}/api/save-result` : 
+              'https://telegram-quiz-bot-fixed.vercel.app/api/save-result';
             console.log('API URL:', apiUrl);
             
             const requestData = {
