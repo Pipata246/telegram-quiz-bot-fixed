@@ -266,34 +266,47 @@ module.exports = async (req, res) => {
 
   console.log('=== BOT WEBHOOK CALLED ===');
   console.log('Method:', req.method);
-  console.log('Headers:', req.headers);
   
   try {
     if (req.method === 'POST') {
       const update = req.body;
-      
       console.log('Received update:', JSON.stringify(update, null, 2));
       
-      // Обработка обычных сообщений
-      if (update.message) {
-        if (update.message.web_app_data) {
-          console.log('Processing web app data:', update.message.web_app_data);
-          await handleWebAppData(update);
+      // Простая обработка без Supabase для начала
+      if (update.message && update.message.text) {
+        const chatId = update.message.chat.id;
+        const text = update.message.text;
+        
+        if (text === '/start') {
+          const welcomeMessage = `🎉 Добро пожаловать в Quiz Bot!\n\nПроверьте свои знания в увлекательной викторине!`;
+          await sendMessage(chatId, welcomeMessage, mainMenu);
+        } else if (text === '🎮 Играть') {
+          const webAppUrl = 'https://telegram-quiz-bot-fixed.vercel.app';
+          const playMessage = `🎮 Готовы начать игру?\n\nНажмите кнопку ниже, чтобы запустить мини-приложение!`;
+          
+          const webAppKeyboard = {
+            reply_markup: {
+              inline_keyboard: [
+                [{
+                  text: '🎮 Запустить игру',
+                  web_app: { url: webAppUrl }
+                }]
+              ]
+            }
+          };
+          
+          await sendMessage(chatId, playMessage, webAppKeyboard);
         } else {
-          console.log('Processing regular message');
-          await handleMessage(update);
+          await sendMessage(chatId, 'Используйте кнопки меню для навигации 👇', mainMenu);
         }
       }
       
-      console.log('Sending OK response');
       res.status(200).json({ ok: true });
     } else {
-      console.log('GET request - returning status');
       res.status(200).json({ message: 'Bot is running', timestamp: new Date().toISOString() });
     }
   } catch (error) {
     console.error('Error in webhook:', error);
-    console.error('Error stack:', error.stack);
-    res.status(200).json({ ok: true }); // Всегда возвращаем 200 для Telegram
+    res.status(200).json({ ok: true });
   }
 };

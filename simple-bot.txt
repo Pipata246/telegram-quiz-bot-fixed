@@ -1,0 +1,1 @@
+Simplified bot without Supabase dependencies
