@@ -10,11 +10,14 @@ let storage = null;
 async function initStorage() {
   if (!storage) {
     try {
+      console.log('Initializing Supabase storage...');
       const SupabaseStorage = require('./supabase');
       storage = new SupabaseStorage();
       await storage.init();
+      console.log('Supabase storage initialized successfully');
     } catch (error) {
       console.error('Failed to initialize Supabase:', error);
+      console.error('Error stack:', error.stack);
       return null;
     }
   }
@@ -111,9 +114,14 @@ module.exports = async (req, res) => {
         // Регистрируем пользователя при любом сообщении
         const store = await initStorage();
         if (store) {
-          const userId = update.message.from.id;
-          const username = update.message.from.username || update.message.from.first_name || `User_${userId}`;
-          await store.registerUser(userId, username);
+          try {
+            const userId = update.message.from.id;
+            const username = update.message.from.username || update.message.from.first_name || `User_${userId}`;
+            await store.registerUser(userId, username);
+            console.log('User registered:', { userId, username });
+          } catch (error) {
+            console.error('Error registering user:', error);
+          }
         }
         
         if (text === '/start') {
@@ -138,10 +146,11 @@ module.exports = async (req, res) => {
         } else if (text === '📊 Моя статистика') {
           const store = await initStorage();
           if (store) {
-            const userId = update.message.from.id;
-            const stats = await store.getUserStats(userId);
-            
-            const statsMessage = `📊 Ваша статистика:
+            try {
+              const userId = update.message.from.id;
+              const stats = await store.getUserStats(userId);
+              
+              const statsMessage = `📊 Ваша статистика:
 
 🎯 Всего игр: ${stats.totalGames}
 ✅ Правильных ответов: ${stats.correctAnswers}
@@ -149,30 +158,39 @@ module.exports = async (req, res) => {
 🏆 Лучший результат: ${stats.bestScore}/10
 📈 Средний результат: ${stats.averageScore.toFixed(1)}/10
 ⭐ Общий рейтинг: ${stats.totalScore} очков`;
-            
-            await sendMessage(chatId, statsMessage, mainMenu);
+              
+              await sendMessage(chatId, statsMessage, mainMenu);
+            } catch (error) {
+              console.error('Error getting stats:', error);
+              await sendMessage(chatId, 'Ошибка при получении статистики. Попробуйте позже.', mainMenu);
+            }
           } else {
-            await sendMessage(chatId, 'Статистика временно недоступна', mainMenu);
+            await sendMessage(chatId, 'База данных недоступна. Попробуйте позже.', mainMenu);
           }
         } else if (text === '🏆 Списки лидеров') {
           const store = await initStorage();
           if (store) {
-            const leaders = await store.getLeaderboard();
-            
-            let leaderMessage = '🏆 Топ-10 игроков:\n\n';
-            
-            leaders.forEach((leader, index) => {
-              const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
-              leaderMessage += `${medal} ${leader.username} - ${leader.total_score} очков\n`;
-            });
+            try {
+              const leaders = await store.getLeaderboard();
+              
+              let leaderMessage = '🏆 Топ-10 игроков:\n\n';
+              
+              leaders.forEach((leader, index) => {
+                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+                leaderMessage += `${medal} ${leader.username} - ${leader.total_score} очков\n`;
+              });
 
-            if (leaders.length === 0) {
-              leaderMessage = '🏆 Список лидеров пока пуст.\nСтаньте первым!';
+              if (leaders.length === 0) {
+                leaderMessage = '🏆 Список лидеров пока пуст.\nСтаньте первым!';
+              }
+
+              await sendMessage(chatId, leaderMessage, mainMenu);
+            } catch (error) {
+              console.error('Error getting leaderboard:', error);
+              await sendMessage(chatId, 'Ошибка при получении списка лидеров. Попробуйте позже.', mainMenu);
             }
-
-            await sendMessage(chatId, leaderMessage, mainMenu);
           } else {
-            await sendMessage(chatId, 'Список лидеров временно недоступен', mainMenu);
+            await sendMessage(chatId, 'База данных недоступна. Попробуйте позже.', mainMenu);
           }
         } else if (text === 'ℹ️ Информация/Поддержка') {
           const infoMessage = `ℹ️ Информация о игре
@@ -192,7 +210,7 @@ module.exports = async (req, res) => {
 • Следите за своей статистикой
 
 📞 Поддержка:
-По всем вопросам обращайтесь к администратору.
+По всем вопросам обращайтесь к администратору @NerdIdk
 
 Удачи в игре! 🍀`;
           await sendMessage(chatId, infoMessage, mainMenu);
