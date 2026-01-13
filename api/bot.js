@@ -10,6 +10,11 @@ let storage = null;
 async function initStorage() {
   if (!storage) {
     try {
+      console.log('=== CHECKING ENVIRONMENT VARIABLES ===');
+      console.log('SUPABASE_URL:', process.env.SUPABASE_URL ? 'SET' : 'MISSING');
+      console.log('SUPABASE_ANON_KEY:', process.env.SUPABASE_ANON_KEY ? 'SET' : 'MISSING');
+      console.log('BOT_TOKEN:', process.env.BOT_TOKEN ? 'SET' : 'MISSING');
+      
       console.log('Initializing Supabase storage...');
       const SupabaseStorage = require('./supabase');
       storage = new SupabaseStorage();
