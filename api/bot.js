@@ -254,6 +254,16 @@ async function handleWebAppData(update) {
 
 // Экспорт для Vercel
 module.exports = async (req, res) => {
+  // Устанавливаем CORS заголовки
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   console.log('=== BOT WEBHOOK CALLED ===');
   console.log('Method:', req.method);
   console.log('Headers:', req.headers);
@@ -284,6 +294,6 @@ module.exports = async (req, res) => {
   } catch (error) {
     console.error('Error in webhook:', error);
     console.error('Error stack:', error.stack);
-    res.status(500).json({ error: 'Internal server error', message: error.message });
+    res.status(200).json({ ok: true }); // Всегда возвращаем 200 для Telegram
   }
 };
