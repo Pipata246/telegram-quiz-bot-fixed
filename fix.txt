@@ -1,0 +1,1 @@
+Fixed bot architecture - removed telegram-bot-api dependency

@@ -1,4 +1,3 @@
-const TelegramBot = require('node-telegram-bot-api');
 const SupabaseStorage = require('./supabase');
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
@@ -255,6 +254,10 @@ async function handleWebAppData(update) {
 
 // Экспорт для Vercel
 module.exports = async (req, res) => {
+  console.log('=== BOT WEBHOOK CALLED ===');
+  console.log('Method:', req.method);
+  console.log('Headers:', req.headers);
+  
   try {
     if (req.method === 'POST') {
       const update = req.body;
@@ -267,16 +270,20 @@ module.exports = async (req, res) => {
           console.log('Processing web app data:', update.message.web_app_data);
           await handleWebAppData(update);
         } else {
+          console.log('Processing regular message');
           await handleMessage(update);
         }
       }
       
+      console.log('Sending OK response');
       res.status(200).json({ ok: true });
     } else {
-      res.status(200).json({ message: 'Bot is running' });
+      console.log('GET request - returning status');
+      res.status(200).json({ message: 'Bot is running', timestamp: new Date().toISOString() });
     }
   } catch (error) {
     console.error('Error in webhook:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ error: 'Internal server error', message: error.message });
   }
 };
