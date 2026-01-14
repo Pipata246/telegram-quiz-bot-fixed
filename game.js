@@ -167,9 +167,11 @@ class QuizGame {
         answerButtons.forEach((btn, index) => {
             btn.textContent = answers[index];
             btn.disabled = false;
-            // Сбрасываем все классы стилизации
+            // Полный сброс всех классов и стилей
             btn.className = 'answer-btn';
             btn.classList.remove('correct', 'incorrect', 'hidden', 'hiding');
+            // Сбрасываем все inline стили
+            btn.style.cssText = '';
             btn.style.opacity = '0';
             btn.style.transform = 'translateY(20px)';
             
