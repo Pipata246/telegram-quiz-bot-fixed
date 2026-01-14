@@ -33,9 +33,9 @@ async function initStorage() {
 const mainMenu = {
   reply_markup: {
     keyboard: [
-      [{ text: '🎮 Играть' }],
-      [{ text: '📊 Моя статистика' }, { text: '🏆 Списки лидеров' }],
-      [{ text: 'ℹ️ Информация/Поддержка' }]
+      [{ text: '\u{1F3AE} Играть' }],
+      [{ text: '\u{1F4CA} Моя статистика' }, { text: '\u{1F3C6} Списки лидеров' }],
+      [{ text: '\u{2139}\u{FE0F} Информация/Поддержка' }]
     ],
     resize_keyboard: true,
     persistent: true
@@ -96,11 +96,11 @@ module.exports = async (req, res) => {
 
             await store.saveGameResult(userId, score, correctAnswers, wrongAnswers, totalQuestions);
 
-            const resultMessage = `🎉 Игра завершена!
+            const resultMessage = `\u{1F389} Игра завершена!
 
-📊 Ваш результат:
-✅ Правильных ответов: ${correctAnswers}/${totalQuestions}
-⭐ Набрано очков: ${score}
+\u{1F4CA} Ваш результат:
+\u{2705} Правильных ответов: ${correctAnswers}/${totalQuestions}
+\u{2B50} Набрано очков: ${score}
 
 Отличная работа! Продолжайте играть и улучшайте свои результаты!`;
 
@@ -130,17 +130,17 @@ module.exports = async (req, res) => {
         }
         
         if (text === '/start') {
-          const welcomeMessage = `🎉 Добро пожаловать в Quiz Bot!\n\nПроверьте свои знания в увлекательной викторине!`;
+          const welcomeMessage = `\u{1F389} Добро пожаловать в Quiz Bot!\n\nПроверьте свои знания в увлекательной викторине!`;
           await sendMessage(chatId, welcomeMessage, mainMenu);
-        } else if (text === '🎮 Играть') {
+        } else if (text === '\u{1F3AE} Играть') {
           const webAppUrl = 'https://telegram-quiz-bot-fixed.vercel.app';
-          const playMessage = `🎮 Готовы начать игру?\n\nНажмите кнопку ниже, чтобы запустить мини-приложение!`;
+          const playMessage = `\u{1F3AE} Готовы начать игру?\n\nНажмите кнопку ниже, чтобы запустить мини-приложение!`;
           
           const webAppKeyboard = {
             reply_markup: {
               inline_keyboard: [
                 [{
-                  text: '🎮 Запустить игру',
+                  text: '\u{1F3AE} Запустить игру',
                   web_app: { url: webAppUrl }
                 }]
               ]
@@ -148,21 +148,21 @@ module.exports = async (req, res) => {
           };
           
           await sendMessage(chatId, playMessage, webAppKeyboard);
-        } else if (text === '📊 Моя статистика') {
+        } else if (text === '\u{1F4CA} Моя статистика') {
           const store = await initStorage();
           if (store) {
             try {
               const userId = update.message.from.id;
               const stats = await store.getUserStats(userId);
               
-              const statsMessage = `📊 Ваша статистика:
+              const statsMessage = `\u{1F4CA} Ваша статистика:
 
-🎯 Всего игр: ${stats.totalGames}
-✅ Правильных ответов: ${stats.correctAnswers}
-❌ Неправильных ответов: ${stats.wrongAnswers}
-🏆 Лучший результат: ${stats.bestScore}/100
-📈 Средний результат: ${stats.averageScore.toFixed(1)}/100
-⭐ Общий рейтинг: ${stats.totalScore} очков`;
+\u{1F3AF} Всего игр: ${stats.totalGames}
+\u{2705} Правильных ответов: ${stats.correctAnswers}
+\u{274C} Неправильных ответов: ${stats.wrongAnswers}
+\u{1F3C6} Лучший результат: ${stats.bestScore}/100
+\u{1F4C8} Средний результат: ${stats.averageScore.toFixed(1)}/100
+\u{2B50} Общий рейтинг: ${stats.totalScore} очков`;
               
               await sendMessage(chatId, statsMessage, mainMenu);
             } catch (error) {
@@ -172,27 +172,27 @@ module.exports = async (req, res) => {
           } else {
             await sendMessage(chatId, 'База данных недоступна. Попробуйте позже.', mainMenu);
           }
-        } else if (text === '🏆 Списки лидеров') {
+        } else if (text === '\u{1F3C6} Списки лидеров') {
           const store = await initStorage();
           if (store) {
             try {
               const leaders = await store.getLeaderboard();
               
-              let leaderMessage = '🏆 Топ-10 игроков:\n\n';
+              let leaderMessage = '\u{1F3C6} Топ-10 игроков:\n\n';
               
               leaders.forEach((leader, index) => {
-                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+                const medal = index === 0 ? '\u{1F947}' : index === 1 ? '\u{1F948}' : index === 2 ? '\u{1F949}' : `${index + 1}.`;
                 const avgScore = leader.total_games > 0 ? (leader.total_score / leader.total_games).toFixed(1) : 0;
                 
                 leaderMessage += `${medal} ${leader.username}\n`;
-                leaderMessage += `   ⭐ Всего очков: ${leader.total_score}\n`;
-                leaderMessage += `   🎮 Игр сыграно: ${leader.total_games}\n`;
-                leaderMessage += `   🏆 Лучший результат: ${leader.best_score}/100\n`;
-                leaderMessage += `   �  Средний результат: ${avgScore}/100\n\n`;
+                leaderMessage += `   \u{2B50} Всего очков: ${leader.total_score}\n`;
+                leaderMessage += `   \u{1F3AE} Игр сыграно: ${leader.total_games}\n`;
+                leaderMessage += `   \u{1F3C6} Лучший результат: ${leader.best_score}/100\n`;
+                leaderMessage += `   \u{1F4CA} Средний результат: ${avgScore}/100\n\n`;
               });
 
               if (leaders.length === 0) {
-                leaderMessage = '🏆 Список лидеров пока пуст.\nСтаньте первым!';
+                leaderMessage = '\u{1F3C6} Список лидеров пока пуст.\nСтаньте первым!';
               }
 
               await sendMessage(chatId, leaderMessage, mainMenu);
@@ -203,27 +203,27 @@ module.exports = async (req, res) => {
           } else {
             await sendMessage(chatId, 'База данных недоступна. Попробуйте позже.', mainMenu);
           }
-        } else if (text === 'ℹ️ Информация/Поддержка') {
-          const infoMessage = `ℹ️ Информация о игре
+        } else if (text === '\u{2139}\u{FE0F} Информация/Поддержка') {
+          const infoMessage = `\u{2139}\u{FE0F} Информация о игре
 
-🎮 Quiz Bot - это увлекательная викторина с множеством категорий вопросов!
+\u{1F3AE} Quiz Bot - это увлекательная викторина с множеством категорий вопросов!
 
-📋 Правила игры:
+\u{1F4CB} Правила игры:
 • В каждой игре 10 случайных вопросов
 • На каждый вопрос дается 15 секунд
 • 4 варианта ответа, только один правильный
 • За каждый правильный ответ +10 очков
 • У вас есть 2 подсказки "50/50" за игру
 
-🏆 Система рейтинга:
+\u{1F3C6} Система рейтинга:
 • Очки накапливаются за все игры
 • Соревнуйтесь с другими игроками
 • Следите за своей статистикой
 
-📞 Поддержка:
+\u{1F4DE} Поддержка:
 По всем вопросам обращайтесь к администратору @NerdIdk
 
-Удачи в игре! 🍀`;
+Удачи в игре! \u{1F340}`;
           await sendMessage(chatId, infoMessage, mainMenu);
         } else {
           await sendMessage(chatId, 'Используйте кнопки меню для навигации 👇', mainMenu);
