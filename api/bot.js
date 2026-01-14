@@ -185,10 +185,10 @@ module.exports = async (req, res) => {
                 const avgScore = leader.total_games > 0 ? (leader.total_score / leader.total_games).toFixed(1) : 0;
                 
                 leaderMessage += `${medal} ${leader.username}\n`;
-                leaderMessage += `   💯 Всего очков: ${leader.total_score}\n`;
-                leaderMessage += `   � оИгр сыграно: ${leader.total_games}\n`;
+                leaderMessage += `   ⭐ Всего очков: ${leader.total_score}\n`;
+                leaderMessage += `   🎮 Игр сыграно: ${leader.total_games}\n`;
                 leaderMessage += `   🏆 Лучший результат: ${leader.best_score}/100\n`;
-                leaderMessage += `   📈 Средний результат: ${avgScore}/100\n\n`;
+                leaderMessage += `   �  Средний результат: ${avgScore}/100\n\n`;
               });
 
               if (leaders.length === 0) {
