@@ -160,8 +160,8 @@ module.exports = async (req, res) => {
 🎯 Всего игр: ${stats.totalGames}
 ✅ Правильных ответов: ${stats.correctAnswers}
 ❌ Неправильных ответов: ${stats.wrongAnswers}
-🏆 Лучший результат: ${stats.bestScore}/10
-📈 Средний результат: ${stats.averageScore.toFixed(1)}/10
+🏆 Лучший результат: ${stats.bestScore}/100
+📈 Средний результат: ${stats.averageScore.toFixed(1)}/100
 ⭐ Общий рейтинг: ${stats.totalScore} очков`;
               
               await sendMessage(chatId, statsMessage, mainMenu);
@@ -182,7 +182,13 @@ module.exports = async (req, res) => {
               
               leaders.forEach((leader, index) => {
                 const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
-                leaderMessage += `${medal} ${leader.username} - ${leader.total_score} очков\n`;
+                const avgScore = leader.total_games > 0 ? (leader.total_score / leader.total_games).toFixed(1) : 0;
+                
+                leaderMessage += `${medal} ${leader.username}\n`;
+                leaderMessage += `   💯 Всего очков: ${leader.total_score}\n`;
+                leaderMessage += `   � оИгр сыграно: ${leader.total_games}\n`;
+                leaderMessage += `   🏆 Лучший результат: ${leader.best_score}/100\n`;
+                leaderMessage += `   📈 Средний результат: ${avgScore}/100\n\n`;
               });
 
               if (leaders.length === 0) {
